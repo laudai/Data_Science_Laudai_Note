@@ -121,7 +121,7 @@ _相關係數容易受到離群值得影響，有興趣可以看書中的程式�
 ```
 推薦可以看此文章補強：[相關係數與共變異數(Correlation Coefficient and Covariance)](https://medium.com/@chih.sheng.huang821/%E7%9B%B8%E9%97%9C%E4%BF%82%E6%95%B8%E8%88%87%E5%85%B1%E8%AE%8A%E7%95%B0%E6%95%B8-correlation-coefficient-and-covariance-c9324c5cf679)
 
-個人心得：相關係數來考量兩個變數之間之關聯性，可以很好理解。當 y = x 時，其實公式會從原本的共變異數/std(x)/std(y) 變成=> 樣本變異數x / $(標準差x)^2$ = 1。因為兩個變數都是相同的，因此相關係數為1，表示完全相關。
+個人心得：相關係數來考量兩個變數之間之關聯性，可以很好理解。當 y = x 時，其實公式會從原本的共變異數/std(x)/std(y) 變成=> 樣本變異數x / (標準差x)^2 = 1。因為兩個變數都是相同的，因此相關係數為1，表示完全相關。
 ### 辛普森悖論
 分析資料時，有時會遇到一種叫做辛普森悖論(_Simpson's Pardox_)，它指的是是因為忽略某些變數，造成相關係數被誤導的情況。
 
@@ -189,6 +189,109 @@ P(F,E) = P(F|E)P(E)
 換個角度來看：99/(99+9999) = 99/10098 = 0.009803922
 驗證了檢測結果為陽性情況下，確實罹患該並機率還不到1%的理論數字。
 
+### 隨機變數
+**隨機變數**指的是一種變數，其可能的值與機率分佈有關。
+而每個值以其相應機率加權之後所計算出來的平均值，稱之為「期望值」。
+
+### 連續分佈
+以丟硬幣的結果而言，對應的是一種「離散分佈（discrete distribution）」，每一個離散的結果都對應到一個正值的機率。
+
+而在「_均勻分佈中(uniform distribution)_」，從0到1之間所有的數值，全都具有相 **_相同的權重_**。
+
+因為0到1之間有無限多個數字，因此，每個數字所分配到的權重也就幾乎趨近於零。我們會用「_機率密度函數(PDF, Probability density function)_」來表示「連續分佈(continuous distribution)」，如此一來，數值落在某個區間的機率，就等於密度函數在該區間的 **_積分_** 結果。
+
+而「_累積分佈函數(CDF, cumulative distribution function)_」，它表示隨機小於等於某個值得機率。
+Python程式碼
+```python
+def uniform_cdf(x: float) -> float:
+"""送回均勻分佈隨機變數值 <=x的機率"""
+if x < 0:   return 0 # 均勻分佈隨機變數值絕不會小於0
+elif x < 1: return x # P(x <=0.4) = 0.4
+else:       return 1 # 均勻分佈隨機變數值永遠小於1
+```
+---
+※PDF 個人學習補充
+```
+在連續變數中，發生在某個數字上的機率為0
+連續的東西，關鍵在於密度！
+對於隨機變數X而言，其機率密度為如下公式
+因此對CDF F_x(x) 微分為 PDF f_x(x)
+PDF f_x(x) 積分為 CDF F_x(x)
+注記，因為不能在程式段裡使用下標，因此用latex語法 _ 作為下標紀錄
+
+```
+![PDF:f_x(x)=\lim_{\Delta x \to 0} \frac {P( x \leq X \leq x+\Delta x)}{ \Delta x}](https://latex.codecogs.com/svg.latex?PDF:f_x(x)=\lim_{\Delta%20x%20\to%200}%20\frac%20{P(%20x%20\leq%20X%20\leq%20x+\Delta%20x)}{%20\Delta%20x})
+
+綜合PDF特性
+* f_x(x) = F'_x(x)
+* 相反則積分回來即可得到CDF
+* 若x位於a b 之間，則機率為fx積分a 到b
+* fx從負無窮大到正無窮大，積分為1
+* fx 一定大於等於0
+* 當x極小時，
+* PDF是可以大於一的
+
+※CDF 個人學習補充
+* uniform 的cdf 他是連續的，而在某個點上，大家的機率都是相同的
+* 下列為CDF公式
+![使用wiki的CDF公式圖片](https://wikimedia.org/api/rest_v1/media/math/render/svg/d437ce3920003ecb7c3baa4e3493788c89c8f2be)
+* Exponential機率分佈：有失憶的性質(memoryless)，常被用來model有這種性質的事情。
+  * e.g.：陷入化妝的小美、陷入無限打電動的阿宅，因為正常而言，會因為一事件花了許多時間，後續會將花在此事的時間減少。
+* Erlang機率分佈：Erlang(n,λ)常被用來model一件有多個關卡事情的總時間，而每個關卡所需時間都是隨機的。
+  * 舉例：關卡數n
+  * 每個關卡所需的機率分佈為Exponential(λ)
+  * 打電動過三關所需的時間為Erlang(3,λ)
+> 補充<br>
+> Erlang 亦稱作Gamma Distribution，其PDF 透過Convolution （中文翻譯褶積）算出
+
+延伸參考資料：
+* [台灣大學 葉丙成教授 5-1：機率密度函數 PDF](https://www.coursera.org/lecture/prob2/5-1-ji-lu-mi-du-han-shu-pdf-lTv8h)
+* [台灣大學 葉丙成教授 5-2：連續機率分佈 I](https://www.coursera.org/lecture/prob2/5-2-lian-xu-ji-lu-fen-bu-i-XKXWr)
+
+
+### 常態分佈
+常態分佈(normal distribution)是一種典型的鐘形曲線分佈，它可以完緣由兩個參數所決定:平均值μ(念mu)與標準差σ(念sigma)。平均值決定鐘形曲線中央的**位置**，標準差決定曲線的**寬度**。
+
+引用wiki常態分佈公式圖片
+![常態分佈圖片參考wiki](https://wikimedia.org/api/rest_v1/media/math/render/svg/21436c871122fb3ba2a676c208afcf91aaebf519)
+
+若μ=0且σ＝1，我們稱之為 **_標準常態分佈_**
+如果Z是一個標準常態隨機變數，其常態分佈可用下列表示
+`X=σZ+μ`，反之標準常態隨機變數Z 則可用`Z=(X-μ)/σ`算出。
+
+※進階研究
+```
+常態分佈的CDF累積分佈函式無法使用簡單解析形式表示，有興趣可以參考誤差函式(Error_function)去算出。(Python math.erf)。
+若要進行normal_cdf的逆向操作，由特定機率求所對應的值，可以使用二元搜尋(binary search)的方式。
+```
+
+### 中央極限定理
+中央極限定理：如果每次都從同一個分佈（identically distributed）中獨立(independent)取出大量的隨機變數，然後取齊平均值作為新的隨機變數，那麼這個隨機變數的分佈，_都會趨近於常態分佈_。
+
+當從平均值μ、標準差σ取出隨機n個變數，且n很大。
+會得到一個趨近於平均值μ、標準差σ/√n的常態分佈。
+而這隨機變數會趨近於一個平均值為0、標準差為1的常態分佈。
+
+亦可通過二項式隨機變數、伯努利隨機變數(Bernoulli)去證實，
+
+自我學習：
+```
+伯努利分布（英語：Bernoulli distribution，又名兩點分布或者0-1分布
+其得到的值不是0就是1，因此值1的機率為p，0的機率為(1-p)，而伯努力變數Bernoulli(p)的平均值為p，標準差則為√p(1-p)。根據中央極限定理，如果n很大，Binoimal(n,p)這個隨機變數會趨近於平均值μ = np、標準差σ=√np(1-p)的常態隨機變數
+
+因此可以把這是為二項式分佈。
+證明二項式分佈的影片可以參考
+其最後驗證方式會用到「二項式定理」
+```
+[影片 Binomial Distribution (二項式分配) 期望值證明](http://www.youtube.com/watch?v=SAw2KT4r4YI)<br>
+[二項式定理](https://zh.wikipedia.org/zh-tw/%E4%BA%8C%E9%A1%B9%E5%BC%8F%E5%AE%9A%E7%90%86)
+
+進階資料：
+```
+scipy.stats 包含大部分的常用機率分佈的機率密度函數（PDF）、和累積分佈函數(CDF)
+作者推薦網路上最佳統計學書籍： https://math.dartmouth.edu/~prob/prob/prob.pdf
+由Grinstead 與 Snell撰寫
+```
 # 資料視覺化
 
 以matplotlib為例：
@@ -227,5 +330,11 @@ plt.annotate('your_label', xy=(data_x[0],data_y[0]),xytext=(5,-5),textcoords='of
 * Altair(https://altair-viz.github.io)，較新的Python視覺化函式庫。
 * D3.js JavaScript函式庫，雖然不是Python寫的，但它可以製作出更精巧、可在網路上互動的視覺化效果，廣受使用值得你花時間去熟悉它。
 * Bokeh 函式庫，具有D3風格視覺化效果帶進入Pyhton世界中。
+
+其它
+---
+因為突然發現Github 不支援Latex，因此數學是要透過其他方式來呈現，目前暫定使用 https://latex.codecogs.com/ 來建立數學式。
+(Latex數學式真的不好寫QQ)
+* [常用数学符号的 LaTeX 表示方法](https://www.mohu.org/info/symbols/symbols.htm)
 
 <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="創用 CC 授權條款" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />本著作係採用<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">創用 CC 姓名標示-相同方式分享 4.0 國際 授權條款</a>授權.
